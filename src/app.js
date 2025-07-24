@@ -1,5 +1,5 @@
 const inspector = require('@inspector-apm/inspector-nodejs')({
-  ingestionKey: '28054b00d4cc6501b015467ac4936a57533ec487',
+  ingestionKey: 'f409b6401a0c70e31afaedb94b5d46eb684336d3',
 });
 
 const express = require('express');
