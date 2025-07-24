@@ -5,7 +5,7 @@ services:
     build: .
     image: node-app
     environment:
-      - MONGODB_URL=mongodb+srv://CarryGoDB:TeamCarryGo2021@carrygo.vtf4f.mongodb.net/carrygo_db?retryWrites=true&w=majority
+      - MONGODB_URL=mongodb+srv://adesokanadedeji10:XHtCian52pt.4qG@cluster0.qnqlt4u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
     ports:
       - '3000:3000'
     depends_on:
