@@ -1,0 +1,39 @@
+version: 0.1
+
+phases:
+  install:
+    commands:
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 471112985825.dkr.ecr.us-east-1.amazonaws.com
+      # - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      # - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 041307037795.dkr.ecr.eu-central-1.amazonaws.com
+      
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image... 
+      - docker build -t carrygo-web-backend .
+      - docker tag carrygo-web-backend:latest 471112985825.dkr.ecr.us-east-1.amazonaws.com/carrygo-web-backend:latest      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push 471112985825.dkr.ecr.us-east-1.amazonaws.com/carrygo-web-backend:latest
+
+      - echo renaming _Dockerrun.aws.json file
+      - mv _Dockerrun.aws.json Dockerrun.aws.json
+      - echo deleting Dockerfile
+      - rm Dockerfile
+      - rm docker-compose.yml
+      - rm docker-compose.dev.yml
+      - rm docker-compose.prod.yml
+      - rm docker-compose.test.yml
+artifacts:
+  files:
+    - '**/*'

@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+  - 12
+env:
+  global:
+    - APP_NAME=carrygo-server
+    - AWS_ECR_ACCOUNT=768136700677
+    - AWS_REGION=us-east-2
+services:
+  - mongodb
+  - docker
+cache: npm
+branches:
+  only:
+    - main
+
+script:
+  - docker --version # document the version travis is using
+  - pip install --user awscli # install aws cli w/o sudo
+  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
+  - eval $(aws ecr get-login --region $AWS_REGION --no-include-email)
+  - docker build -t $APP_NAME .
+  - docker tag $APP_NAME $AWS_ECR_ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/$APP_NAME
+  # - docker push $AWS_ECR_ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/$APP_NAME
+
+after_success:
+  - echo "Successfully built and pushed the image"

@@ -1,0 +1,10 @@
+module.exports.authController = require('./auth.controller');
+module.exports.userController = require('./user.controller');
+module.exports.dsoController = require('./dso.controller');
+module.exports.riderController = require('./rider.controller');
+module.exports.orderController = require('./order.controller');
+module.exports.chatController = require('./chat.controller');
+module.exports.reviewController = require('./review.controller');
+module.exports.requestController = require('./request.controller');
+module.exports.dashboardController = require('./dashboard.controller');
+module.exports.transactionController = require('./transaction.controller');

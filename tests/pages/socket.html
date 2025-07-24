@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrygo socket test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .chat-area{
+            height: 500px;
+            width: 60%;
+            overflow-y: auto;
+            background: #c2c2c2;
+            margin: 10px auto;
+            padding-top: 20px;
+        }
+        .form-area{
+            /* position: absolute;
+            bottom: 60px; */
+            background: #fff;
+            margin: 0 auto;
+            width: 60%;
+        }
+        .message-area{
+            position: relative;
+            float: left;
+            width: 20%;
+        }
+        .message-area{
+            position: relative;
+            float: right;
+            width: 80%;
+        }
+        .me{
+            width: 30%;
+            margin:20px 0;
+            padding: 10px 5px;
+            background-color: azure;
+        }
+        .them{
+            width: 30%;
+            padding: 10px 5px;
+            background-color:burlywood;
+            clear: both;
+        }
+        .clearfix{
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-area">
+        <div class="container">
+            <div class="col-md-2">
+                <ul id="chat-list"></ul>
+            </div>
+            <div class="col-md-8" id="message-list"></div>
+        </div>
+
+    </div>
+    <form action="" onsubmit="return false;" class="form-area">
+        <div style="display: inline-flex;">
+            <input type="text" placeholder="Type a message..." id="message" class="form-control" autofocus>
+            <button class="btn btn-success" onclick="sendMessage()">Send</button>
+        </div>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script>
+        const socket = io.connect("https://carrygo-backend.herokuapp.com/");
+        const url_string = window.location.href
+        const url = new URL(url_string);
+        const senderId = url.searchParams.get("sender");
+        const customerId = url.searchParams.get("customer");
+        const adminId = url.searchParams.get("admin");
+        
+        socket.emit('new-user', {adminId,customerId});
+        
+        socket.on("get-chats", (data) => {
+            console.log('list of chats ', data); 
+            data.results.map(chat =>{
+                document.getElementById('chat-list').innerHTML = `<li>${chat.adminName} <> ${chat.customerName} </li>`;
+            });
+        });
+
+        socket.on("get-messages", (data) => {
+            console.log('list of messages ', data); 
+            data.results.map(message =>{
+                const thisMessage = message.senderId === senderId
+                ? `
+                <div class="me">
+                    <p>
+                        ${message.message}
+                    </p>
+                </div>
+                `
+                : `
+                <div class="them">
+                    <p>
+                        ${message.message}
+                    </p>
+                </div>
+                `
+                document.getElementById('message-list').innerHTML += thisMessage;
+            });;
+        });
+
+        const sendMessage = ()=>{
+            const message = document.getElementById('message').value;
+            
+            // const [adminId,customerId,senderId, socket_id] = [admin,customer,sender,socket.id];
+            // console.log('socket_id ',socket_id)
+
+            socket.emit('send-message', {adminId,customerId,senderId,message})
+            document.getElementById('message').value = "";
+        }
+    </script>
+</body>
+</html>
