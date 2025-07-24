@@ -1,6 +1,7 @@
 const inspector = require('@inspector-apm/inspector-nodejs')({
-  ingestionKey: 'f409b6401a0c70e31afaedb94b5d46eb684336d3',
+  ingestionKey: process.env.INSPECTOR_API_KEY,
 });
+
 
 const express = require('express');
 const helmet = require('helmet');
