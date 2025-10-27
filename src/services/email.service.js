@@ -33,7 +33,7 @@ const sendEmail = async (to, subject, text) => {
 const sendgridOtpEmail = async(to, code) => {
   const msg = {
     to: to,
-    from: 'tech@carrygo.me', 
+    from: 'tech@carrygo.org', 
     subject: 'Email Verification',
     text: `Dear user,
     Your Email authentication code is: ${code}`,
