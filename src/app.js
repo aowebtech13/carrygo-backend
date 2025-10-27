@@ -1,3 +1,5 @@
+require('newrelic'); // imports newrelic
+
 const inspector = require('@inspector-apm/inspector-nodejs')({
   ingestionKey: process.env.INSPECTOR_API_KEY,
 });
@@ -20,7 +22,6 @@ const webRoutes = require('./routes/v1/web');
 
 
 require('./utils/websocket'); // imports the websocket
-require('newrelic'); // imports newrelic
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
