@@ -71,16 +71,16 @@ const sendSmsWithAT = async(recipient, message) =>{
 
     // return s;
 
-    const apiKey = 'TLIWyKhVf0ce0JNa6m4kpjAoFS7H08DiOLmBElx6BzF6nZ10mku8jYctnvrG8z'
+    const apiKey = 'TLedujUbHhrxJiVKtiqNsGenxiqvhCLlEgJtUgnreVnPLByvWOzyRoHnODDtBa'
 
     try {
         const data = {
           to: recipient,
-          from: 'N-Alert',
+          from: 'CarryGo',
           sms: message,
           type: 'plain',
           api_key: apiKey,
-          channel: 'dnd',
+          channel: 'generic',
         };
           
         const url = 'https://api.ng.termii.com/api/sms/send'
