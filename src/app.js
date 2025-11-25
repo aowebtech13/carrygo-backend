@@ -70,6 +70,7 @@ app.use('/v1/web', webRoutes);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
