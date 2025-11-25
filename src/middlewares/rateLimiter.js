@@ -9,7 +9,7 @@ const authLimiter = rateLimit({
   //   expireTimeMs: 1 * 60 * 1000, // 1 minute,
   //   collectionName: 'rate-limits'
   // }),
-  max: 5,
+  max: 10,
   windowMs: 60 * 1000, // 1 sec
   // keyGenerator(req){
   //   return req.sessionId;
