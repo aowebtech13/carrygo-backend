@@ -1,4 +1,4 @@
-require('newrelic'); // imports newrelic
+//require('newrelic'); // imports newrelic
 
 const inspector = require('@inspector-apm/inspector-nodejs')({
   ingestionKey: process.env.INSPECTOR_API_KEY,
@@ -60,7 +60,9 @@ app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
 // api rate limit
-app.use(authLimiter);
+// app.use(authLimiter);
+app.use('/v1/mobile/auth', authLimiter);
+app.use('/v1/web/auth', authLimiter);
 
 // v1 api routes
 app.use('/v1/mobile', mobileRoutes);
