@@ -1,33 +1,15 @@
 /* eslint-disable no-console */
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
-const transport = nodemailer.createTransport({
-  host: 'smtp.zeptomail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: 'emailapikey',
-    pass: 'wSsVR61180GlDK10lTKodbtqkF0BBFL2EBl52VCp6XCoS63GoMdtlEDOVwH1HfYZEzVoHGNDprl/mR0I1DAJitt4w1gFXSiF9mqRe1U4J3x17qnvhDzMWWhUlRGJKoMLxwtsmWRoEcEm+g=='
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000
-});
+const ZEPTOMAIL_API_KEY = 'wSsVR61180GlDK10lTKodbtqkF0BBFL2EBl52VCp6XCoS63GoMdtlEDOVwH1HfYZEzVoHGNDprl/mR0I1DAJitt4w1gFXSiF9mqRe1U4J3x17qnvhDzMWWhUlRGJKoMLxwtsmWRoEcEm+g==';
+const ZEPTOMAIL_API_URL = 'https://api.zeptomail.com/v1.1/email';
+const FROM_EMAIL = '"CarryGo" <tech@carrygo.org>';
+
 /* istanbul ignore next */
 if (config.env !== 'test') {
-  logger.info('SMTP Configuration:', {
-    host: config.email.smtp.host,
-    port: config.email.smtp.port,
-    secure: config.email.smtp.secure,
-    user: config.email.smtp.auth?.user,
-    hasPassword: !!config.email.smtp.auth?.pass
-  });
-  transport
-    .verify()
-    .then(() => logger.info('Connected to email server'))
-    .catch((error) => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env',error));
+  logger.info('ZeptoMail API configured successfully');
 }
 
 /**
@@ -37,29 +19,51 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, html) => {
   try {
-    const msg = { from: '"CarryGo" <tech@carrygo.org>', to, subject, text };
-    await transport.sendMail(msg);
+    const payload = {
+      from: {
+        address: 'tech@carrygo.org',
+        name: 'CarryGo'
+      },
+      to: [
+        {
+          email_address: {
+            address: to
+          }
+        }
+      ],
+      subject: subject,
+      textbody: text,
+      htmlbody: html || text
+    };
+
+    const response = await axios.post(ZEPTOMAIL_API_URL, payload, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': ZEPTOMAIL_API_KEY
+      }
+    });
+
+    logger.info('Email sent successfully:', response.data);
+    return response.data;
   } catch (error) {
-    console.log(error)
+    logger.error('Error sending email:', error.response?.data || error.message);
+    console.log(error.response?.data || error.message);
+    throw error;
   }
 };
 
 const sendgridOtpEmail = async(to, code) => {
   try {
-    const msg = {
-      from: '"CarryGo" <tech@carrygo.org>',
-      to: to,
-      subject: 'Email Verification',
-      text: `Dear user,
-    Your Email authentication code is: ${code}`,
-      html: `
+    const text = `Dear user,
+    Your Email authentication code is: ${code}`;
+    const html = `
     <p>Dear user,
     Your Email authentication code is: ${code}</p>
-    `,
-    };
-    await transport.sendMail(msg);
+    `;
+    await sendEmail(to, 'Email Verification', text, html);
   } catch (error) {
     console.error(error);
   }
@@ -135,7 +139,6 @@ const sendEmailToAdmin = async (to, name) => {
 };
 
 module.exports = {
-  transport,
   sendEmail,
   userVerified,
   sendOtpEmail,
