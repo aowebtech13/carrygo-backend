@@ -18,11 +18,9 @@ const envVarsSchema = Joi.object()
     JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: Joi.number()
       .default(10)
       .description('minutes after which verify email token expires'),
-    SMTP_HOST: Joi.string().description('server that will send the emails'),
-    SMTP_PORT: Joi.number().description('port to connect to the email server'),
-    SMTP_USERNAME: Joi.string().description('username for email server'),
-    SMTP_PASSWORD: Joi.string().description('password for email server'),
-    EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    ZEPTOMAIL_TOKEN: Joi.string().description('ZeptoMail API token'),
+    ZEPTOMAIL_FROM_EMAIL: Joi.string().description('the from email address in the emails sent by the app'),
+    ZEPTOMAIL_FROM_NAME: Joi.string().description('the from name in the emails sent by the app'),
   })
   .unknown();
 
@@ -51,16 +49,10 @@ module.exports = {
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
   },
   email: {
-    smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
-      secure: true,
-      auth: {
-        user: envVars.SMTP_USERNAME,
-        pass: envVars.SMTP_PASSWORD,
-      },
-      tls: {rejectUnauthorized: false},
+    zeptomail: {
+      token: envVars.ZEPTOMAIL_TOKEN,
+      fromEmail: envVars.ZEPTOMAIL_FROM_EMAIL,
+      fromName: envVars.ZEPTOMAIL_FROM_NAME,
     },
-    from: envVars.EMAIL_FROM,
   },
 };

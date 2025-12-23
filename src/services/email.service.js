@@ -1,17 +1,21 @@
 /* eslint-disable no-console */
-const nodemailer = require('nodemailer');
+const { SendMailClient } = require('zeptomail');
 const config = require('../config/config');
 const logger = require('../config/logger');
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const transport = nodemailer.createTransport(config.email.smtp);
+let client;
+
 /* istanbul ignore next */
-if (config.env !== 'test') {
-  transport
-    .verify()
-    .then(() => logger.info('Connected to email server'))
-    .catch((error) => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env',error));
+if (config.env !== 'test' && config.email.zeptomail.token) {
+  try {
+    const url = 'api.zeptomail.com/';
+    client = new SendMailClient({ url, token: config.email.zeptomail.token });
+    logger.info('ZeptoMail client initialized');
+  } catch (error) {
+    logger.warn('Unable to initialize ZeptoMail client. Make sure you have configured ZEPTOMAIL_TOKEN in .env', error);
+  }
+} else if (config.env !== 'test') {
+  logger.warn('ZeptoMail token not configured. Email functionality will not work.');
 }
 
 /**
@@ -19,41 +23,54 @@ if (config.env !== 'test') {
  * @param {string} to
  * @param {string} subject
  * @param {string} text
+ * @param {string} html - Optional HTML content
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, html = null) => {
   try {
-    const msg = { from: config.email.from, to, subject, text };
-    await transport.sendMail(msg);
+    if (!client) {
+      logger.error('ZeptoMail client not initialized');
+      return;
+    }
+
+    const mailOptions = {
+      from: {
+        address: config.email.zeptomail.fromEmail,
+        name: config.email.zeptomail.fromName || 'CarryGo',
+      },
+      to: [
+        {
+          email_address: {
+            address: to,
+          },
+        },
+      ],
+      subject,
+      textbody: text,
+    };
+
+    if (html) {
+      mailOptions.htmlbody = html;
+    }
+
+    await client.sendMail(mailOptions);
+    logger.info(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.log(error)
+    logger.error('Error sending email:', error);
+    console.log(error);
   }
 };
 
 const sendgridOtpEmail = async(to, code) => {
-  const msg = {
-    to: to,
-    from: 'tech@carrygo.org', 
-    subject: 'Email Verification',
-    text: `Dear user,
-    Your Email authentication code is: ${code}`,
-    html: `
-    <p>Dear user,
-    Your Email authentication code is: ${code}</p>
-    `,
-  };
-
-  (async () => {
-    try {
-      await sgMail.send(msg);
-    } catch (error) {
-      console.error(error);
-  
-      if (error.response) {
-        console.error(error.response.body)
-      }
-    }
-  })();
+  try {
+    const subject = 'Email Verification';
+    const text = `Dear user,
+Your Email authentication code is: ${code}`;
+    const html = `<p>Dear user,<br>Your Email authentication code is: ${code}</p>`;
+    await sendEmail(to, subject, text, html);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 /**
@@ -126,7 +143,6 @@ const sendEmailToAdmin = async (to, name) => {
 };
 
 module.exports = {
-  transport,
   sendEmail,
   userVerified,
   sendOtpEmail,
