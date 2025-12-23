@@ -6,6 +6,13 @@ const logger = require('../config/logger');
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
 if (config.env !== 'test') {
+  logger.info('SMTP Configuration:', {
+    host: config.email.smtp.host,
+    port: config.email.smtp.port,
+    secure: config.email.smtp.secure,
+    user: config.email.smtp.auth?.user,
+    hasPassword: !!config.email.smtp.auth?.pass
+  });
   transport
     .verify()
     .then(() => logger.info('Connected to email server'))
