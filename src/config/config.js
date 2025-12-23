@@ -55,10 +55,13 @@ module.exports = {
       host: envVars.SMTP_HOST,
       port: envVars.SMTP_PORT,
       secure: false,
+      requireTLS: true,
       auth: {
         user: envVars.SMTP_USERNAME,
         pass: envVars.SMTP_PASSWORD,
       },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
     },
     from: envVars.EMAIL_FROM,
   },
