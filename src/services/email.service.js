@@ -1,15 +1,16 @@
 /* eslint-disable no-console */
-const axios = require('axios');
+const { SendMailClient } = require('zeptomail');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
-const ZEPTOMAIL_API_KEY = 'wSsVR61180GlDK10lTKodbtqkF0BBFL2EBl52VCp6XCoS63GoMdtlEDOVwH1HfYZEzVoHGNDprl/mR0I1DAJitt4w1gFXSiF9mqRe1U4J3x17qnvhDzMWWhUlRGJKoMLxwtsmWRoEcEm+g==';
-const ZEPTOMAIL_API_URL = 'https://api.zeptomail.com/v1.1/email';
-const FROM_EMAIL = '"CarryGo" <tech@carrygo.org>';
+const url = 'https://api.zeptomail.com/v1.1/email';
+const token = 'Zoho-enczapikey wSsVR61180GlDK10lTKodbtqkF0BBFL2EBl52VCp6XCoS63GoMdtlEDOVwH1HfYZEzVoHGNDprl/mR0I1DAJitt4w1gFXSiF9mqRe1U4J3x17qnvhDzMWWhUlRGJKoMLxwtsmWRoEcEm+g==';
+
+const client = new SendMailClient({ url, token });
 
 /* istanbul ignore next */
 if (config.env !== 'test') {
-  logger.info('ZeptoMail API configured successfully');
+  logger.info('ZeptoMail SDK configured successfully');
 }
 
 /**
@@ -21,7 +22,7 @@ if (config.env !== 'test') {
  */
 const sendEmail = async (to, subject, text, html) => {
   try {
-    const payload = {
+    const response = await client.sendMail({
       from: {
         address: 'tech@carrygo.org',
         name: 'CarryGo'
@@ -29,28 +30,21 @@ const sendEmail = async (to, subject, text, html) => {
       to: [
         {
           email_address: {
-            address: to
+            address: to,
+            name: to.split('@')[0]
           }
         }
       ],
       subject: subject,
       textbody: text,
       htmlbody: html || text
-    };
-
-    const response = await axios.post(ZEPTOMAIL_API_URL, payload, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': ZEPTOMAIL_API_KEY
-      }
     });
 
-    logger.info('Email sent successfully:', response.data);
-    return response.data;
+    logger.info('Email sent successfully');
+    return response;
   } catch (error) {
-    logger.error('Error sending email:', error.response?.data || error.message);
-    console.log(error.response?.data || error.message);
+    logger.error('Error sending email:', error.message);
+    console.log(error);
     throw error;
   }
 };
