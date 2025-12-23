@@ -3,7 +3,18 @@ const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
-const transport = nodemailer.createTransport(config.email.smtp);
+const transport = nodemailer.createTransport({
+  host: 'smtp.zeptomail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: 'emailapikey',
+    pass: 'wSsVR61180GlDK10lTKodbtqkF0BBFL2EBl52VCp6XCoS63GoMdtlEDOVwH1HfYZEzVoHGNDprl/mR0I1DAJitt4w1gFXSiF9mqRe1U4J3x17qnvhDzMWWhUlRGJKoMLxwtsmWRoEcEm+g=='
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000
+});
 /* istanbul ignore next */
 if (config.env !== 'test') {
   logger.info('SMTP Configuration:', {
@@ -28,7 +39,7 @@ if (config.env !== 'test') {
  */
 const sendEmail = async (to, subject, text) => {
   try {
-    const msg = { from: config.email.from, to, subject, text };
+    const msg = { from: '"CarryGo" <tech@carrygo.org>', to, subject, text };
     await transport.sendMail(msg);
   } catch (error) {
     console.log(error)
@@ -38,7 +49,7 @@ const sendEmail = async (to, subject, text) => {
 const sendgridOtpEmail = async(to, code) => {
   try {
     const msg = {
-      from: config.email.from,
+      from: '"CarryGo" <tech@carrygo.org>',
       to: to,
       subject: 'Email Verification',
       text: `Dear user,
