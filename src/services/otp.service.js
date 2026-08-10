@@ -7,6 +7,7 @@
 /* eslint-disable prettier/prettier */
 const { credentials } = require('../config/variables/config.variable');
 var axios = require('axios');
+var FormData = require('form-data');
 
 
 const httpStatus = require('http-status');
@@ -50,16 +51,15 @@ const sendOtp = async(recipient) => {
 
 const sendSmsWithKudi = async(recipient, message) =>{
     try {
-        const data = new URLSearchParams({
-          token: process.env.KUDISMS_API_KEY,
-          senderID: process.env.KUDISMS_SENDER_ID,
-          recipients: recipient.replace(/^\+/, ''),
-          message,
-        });
+        const data = new FormData();
+        data.append('token', process.env.KUDISMS_API_KEY);
+        data.append('senderID', process.env.KUDISMS_SENDER_ID);
+        data.append('recipients', recipient.replace(/^\+/, ''));
+        data.append('message', message);
 
         const url = 'https://my.kudisms.net/api/corporate'
 
-        const response = await axios.post(url, data);
+        const response = await axios.post(url, data, { headers: data.getHeaders() });
         console.log('Response:', response.data);
       } catch (error) {
         console.error('fail',error.message);

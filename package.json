@@ -65,6 +65,7 @@
     "express-mongo-sanitize": "^2.0.0",
     "express-rate-limit": "^5.5.1",
     "flutterwave-node-v3": "^1.0.9",
+    "form-data": "^4.0.0",
     "geo-nearby": "^2.0.1",
     "google-play-scraper": "^8.1.0",
     "helmet": "^4.1.0",
