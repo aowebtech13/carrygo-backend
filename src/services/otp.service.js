@@ -41,86 +41,30 @@ const sendOtp = async(recipient) => {
 
     
     const otp = await generateOtp(recipient)
-    await sendSmsWithAT(
+    await sendSmsWithKudi(
         recipient,
         `Use this code: ${otp} to Verify your phone number with CarryGo. Otp expires in 5 minutes`
-    )    
+    )
     return 'send_message';
 };
 
-const sendSmsWithAT = async(recipient, message) =>{
-    // Initialize a service e.g. SMS
-    // const sms = Africastalking.SMS
-    
-    // // Use the service
-    // const options = {
-    //     to: recipient,
-    //     from: process.env.AFTKNG_SENDER_ID,
-    //     message,
-    //     enqueue: true,
-    // }
-    
-    // // Send message and capture the response or error
-    // const s = await sms.send(options)
-    // .then( response => {
-    //     console.log({response});
-    // })
-    // .catch( error => {
-    //     console.log({error});
-    // });
-
-    // return s;
-
-    const apiKey = 'TLedujUbHhrxJiVKtiqNsGenxiqvhCLlEgJtUgnreVnPLByvWOzyRoHnODDtBa'
-
+const sendSmsWithKudi = async(recipient, message) =>{
     try {
-        const data = {
-          to: recipient,
-          from: 'CarryGo',
-          sms: message,
-          type: 'plain',
-          api_key: apiKey,
-          channel: 'generic',
-        };
-          
-        const url = 'https://api.ng.termii.com/api/sms/send'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
-    
-        const response = await axios.post(
-            url,
-            data, 
-            { headers }
-        );
+        const data = new URLSearchParams({
+          token: process.env.KUDISMS_API_KEY,
+          senderID: process.env.KUDISMS_SENDER_ID,
+          recipients: recipient,
+          message,
+        });
+
+        const url = 'https://my.kudisms.net/api/corporate'
+
+        const response = await axios.post(url, data);
         console.log('Response:', response.data);
-        console.log('sus',response.data);
       } catch (error) {
         console.error('fail',error.message);
       }
 
-    // const apiKey = 'TLIWyKhVf0ce0JNa6m4kpjAoFS7H08DiOLmBElx6BzF6nZ10mku8jYctnvrG8z'
-    // var data = {
-    //         "to": recipient,
-    //         "from":"CarryGo",
-    //         "sms": message,
-    //         "type":"plain",
-    //         "api_key": apiKey,
-    //         "channel":"dnd",   
-    //     };
-    // var options = {
-    // 'method': 'POST',
-    // 'url': 'https://api.ng.termii.com/api/sms/send',
-    // 'headers': {
-    // 'Content-Type': ['application/json', 'application/json']
-    // },
-    // body: JSON.stringify(data)
-
-    // };
-    // request(options, function (error, response) { 
-    // if (error) throw new Error(error);
-    // // console.log(response.body);
-    // });
     return true
 }
 
