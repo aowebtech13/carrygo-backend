@@ -53,7 +53,7 @@ const sendSmsWithKudi = async(recipient, message) =>{
         const data = new URLSearchParams({
           token: process.env.KUDISMS_API_KEY,
           senderID: process.env.KUDISMS_SENDER_ID,
-          recipients: recipient,
+          recipients: recipient.replace(/^\+/, ''),
           message,
         });
 
