@@ -7,6 +7,7 @@ const schema = mongoose.Schema(
     mobileNumber: {
         type: String,
         required: true,
+        unique: true,
     },
     otp: {
         type: String,

@@ -90,36 +90,9 @@ const verifyOtp = async (mobileNumber,otp) => {
     return true;
 };
 
-const saveOTP = async (mobileNumber, otp, blacklisted = false) => {
-    const expires = moment().add(process.env.OTP_EXPIRATION_TIME, 'minutes');
-    const otpDoc =  new OTP({
-        mobileNumber,
-        otp,
-        expires,
-        blacklisted,
-    });
-    otpDoc.save();
-    return otpDoc;
-};
-
-
-const getOTP = async(mobileNumber) =>{
-    const otp = await OTP.findOne({ mobileNumber });
-    if(!otp) return null;
-    return otp;
-}
-
 const getUnusedOTP = async(mobileNumber) =>{
     const otp = await OTP.findOne({ mobileNumber, blacklisted: false });
     return otp;
-}
-
-const updateOTP = async(mobileNumber, payload) =>{
-    const updated = await OTP.updateOne({mobileNumber},{"$set":payload})
-    if (!updated) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Error creating OTP');
-    }
-    return updated;
 }
 
 const blacklistOTP = async(mobileNumber) =>{
@@ -132,23 +105,13 @@ const blacklistOTP = async(mobileNumber) =>{
 
 const generateOtp = async(recipient)=>{
     const otp = getRndInteger(100000,999999);
-    // save the otp with the mobile number
-    const checkOtp = await getOTP(recipient);
-    if(!checkOtp){
-        // save OTP
-        console.log('new otp',recipient, otp)
-        await saveOTP(recipient, otp);
-    }else{
-        // update OTP
-        console.log('refresh otp',recipient, otp)
-        const expires = moment().add(process.env.OTP_EXPIRATION_TIME, 'minutes')
-        await updateOTP(recipient,{
-            mobileNumber: recipient,
-            otp,
-            blacklisted: false,
-            expires
-        });
-    }
+    const expires = moment().add(process.env.OTP_EXPIRATION_TIME, 'minutes');
+    // atomic upsert so concurrent requests for the same recipient can't create duplicate OTP docs
+    await OTP.findOneAndUpdate(
+        { mobileNumber: recipient },
+        { $set: { otp, expires, blacklisted: false } },
+        { upsert: true, setDefaultsOnInsert: true }
+    );
     return otp;
 }
 
