@@ -8,3 +8,6 @@ module.exports.reviewController = require('./review.controller');
 module.exports.requestController = require('./request.controller');
 module.exports.dashboardController = require('./dashboard.controller');
 module.exports.transactionController = require('./transaction.controller');
+module.exports.shopController = require('./shop.controller');
+module.exports.productController = require('./product.controller');
+module.exports.offerController = require('./offer.controller');

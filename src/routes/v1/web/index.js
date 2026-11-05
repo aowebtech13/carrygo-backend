@@ -10,6 +10,8 @@ const reviewRoute = require('./review.route');
 const requestRoute = require('./request.route');
 const dashboardRoute = require('./dashboard.route');
 const transactionRoute = require('./transaction.route');
+const shopRoute = require('./shop.route');
+const offerRoute = require('./offer.route');
 
 const router = express.Router();
 
@@ -57,6 +59,14 @@ const defaultRoutes = [
   {
     path: '/transactions',
     route: transactionRoute,
+  },
+  {
+    path: '/shops',
+    route: shopRoute,
+  },
+  {
+    path: '/offers',
+    route: offerRoute,
   },
 ];
 

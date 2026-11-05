@@ -13,3 +13,6 @@ module.exports.dashboardService = require('./dashboard.service');
 module.exports.transactionService = require('./transaction.service');
 module.exports.cronService = require('./cron.service');
 module.exports.extrasService = require('./extras.service');
+module.exports.shopService = require('./shop.service');
+module.exports.productService = require('./product.service');
+module.exports.offerService = require('./offer.service');

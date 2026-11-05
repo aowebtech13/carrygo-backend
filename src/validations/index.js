@@ -7,4 +7,5 @@ module.exports.chatValidation = require('./chat.validation');
 module.exports.reviewValidation = require('./review.validation');
 module.exports.requestValidation = require('./request.validation');
 module.exports.transactionValidation = require('./transaction.validation');
-
+module.exports.shopValidation = require('./shop.validation');
+module.exports.offerValidation = require('./offer.validation');
